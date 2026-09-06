@@ -1,0 +1,27 @@
+import { createContext, useContext, useState } from 'react'
+
+const AuthContext = createContext(null)
+
+export function AuthProvider({ children }) {
+  // Restore the session after a page refresh when the saved user data is valid JSON.
+  const [user, setUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('user')) } catch { return null }
+  })
+
+  const login = (data) => {
+    // Keep the token for API requests and the user profile for rendering the session UI.
+    localStorage.setItem('token', data.token)
+    localStorage.setItem('user', JSON.stringify(data.user))
+    setUser(data.user)
+  }
+
+  const logout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    setUser(null)
+  }
+
+  return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>
+}
+
+export const useAuth = () => useContext(AuthContext)
