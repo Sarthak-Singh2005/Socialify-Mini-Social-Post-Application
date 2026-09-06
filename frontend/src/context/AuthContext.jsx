@@ -3,21 +3,21 @@ import { createContext, useContext, useState } from 'react'
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  // Restore the session after a page refresh when the saved user data is valid JSON.
+  // Restore the session after a page refresh within the current browser session.
   const [user, setUser] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('user')) } catch { return null }
+    try { return JSON.parse(sessionStorage.getItem('user')) } catch { return null }
   })
 
   const login = (data) => {
-    // Keep the token for API requests and the user profile for rendering the session UI.
-    localStorage.setItem('token', data.token)
-    localStorage.setItem('user', JSON.stringify(data.user))
+    // Keep the session only until the browser is closed.
+    sessionStorage.setItem('token', data.token)
+    sessionStorage.setItem('user', JSON.stringify(data.user))
     setUser(data.user)
   }
 
   const logout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
+    sessionStorage.removeItem('token')
+    sessionStorage.removeItem('user')
     setUser(null)
   }
 
